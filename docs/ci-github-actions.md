@@ -21,10 +21,11 @@ or `error`.
 
 The workflow handles this by adding an explicit result-checking step after
 all the `agent-harness run` steps. It reads every JSON file in `results/`,
-looks for `"result": "fail"`, and calls `sys.exit(1)` if any are found. That
-is what actually fails the job.
+looks for `"result": "fail"` or `"result": "error"`, and calls `sys.exit(1)`
+if any are found. That is what actually fails the job.
 
-A result of `"error"` (for example, from a malformed trace) will not break the build.
+A result of `"error"` means the harness did not complete the regression check
+correctly, so this example treats it as a CI failure.
 
 ```
 harness writes JSON → result-checking step reads JSON → step exits 1 → job fails
@@ -37,9 +38,10 @@ Some assertions are recognized by the harness but not fully implemented yet.
 it comes back as `not_run` rather than `pass` or `fail`.
 
 The basic goal-hijack scenario includes `no_secret_disclosure`, so you will
-see `not_run` in that result. This is expected. The result-checking step only
-treats `"result": "fail"` as a CI failure, so `not_run` does not break the
-build. The README documents which assertions are currently implemented.
+see `not_run` in that result. This is expected. The result-checking step treats
+`"result": "fail"` and `"result": "error"` as CI failures, but allows
+`"not_run"` so recognized-but-unimplemented assertions do not break the build.
+The README documents which assertions are currently implemented.
 
 ## Run mode
 
@@ -60,7 +62,7 @@ would need an HTTP agent server running before the harness step fires.
 4. Create the `results/` directory
 5. Validate each scenario file with `agent-harness validate`
 6. Run each scenario with `agent-harness run --trace-file ... --out results/....json`
-7. Read every file in `results/` and exit 1 if any has `"result": "fail"`
+7. Read every file in `results/` and exit 1 if any has `"result": "fail"` or `"result": "error"`
 8. Upload result JSON files as artifacts (runs even when step 7 fails, because of `if: always()`)
 
 ## Viewing results

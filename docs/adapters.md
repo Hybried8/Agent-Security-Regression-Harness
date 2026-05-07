@@ -297,27 +297,33 @@ Examples of adapter failures:
 
 The CLI should catch `AdapterError` and display a clear error message.
 
-## Optional dependencies
+## Optional framework dependencies
 
-Framework adapters must use optional dependencies.
+The harness core should remain lightweight and vendor-neutral.
 
-The base harness install should remain lightweight and vendor-neutral.
-
-Base install:
+Framework-specific adapter dependencies are installed through optional extras. Future adapter implementations should use extras such as:
 
 ```bash
-python -m pip install agent-harness
+python -m pip install "owasp-agent-security-regression-harness[openai-agents]"
+python -m pip install "owasp-agent-security-regression-harness[langchain]"
+python -m pip install "owasp-agent-security-regression-harness[mcp]"
+python -m pip install "owasp-agent-security-regression-harness[adapters]"
 ```
 
-Future framework extras may look like:
+The base package must not require OpenAI Agents SDK, LangChain, LangGraph, MCP SDKs, or other framework-specific dependencies.
 
-```bash
-python -m pip install "agent-harness[openai-agents]"
-python -m pip install "agent-harness[langchain]"
-python -m pip install "agent-harness[mcp]"
+Some extras may be reserved before their adapter implementation lands. They should only gain dependencies when the corresponding adapter is implemented and tested.
+
+Adapter implementations must handle missing optional dependencies with clear errors.
+
+Example error:
+
+```text
+OpenAI Agents SDK adapter dependencies are not installed.
+Install them with: python -m pip install "owasp-agent-security-regression-harness[openai-agents]"
 ```
 
-Framework packages should not be added to required dependencies unless they are required by the core harness.
+Scenario files should remain framework-neutral. Framework-specific execution should be selected through explicit CLI flags or adapter entry points, not hidden inside scenario YAML.
 
 ## Adapter testing requirements
 
@@ -349,10 +355,32 @@ Example:
 ```bash
 agent-harness run scenarios/goal_hijack/basic.yaml \
   --python-target examples.targets.python_callable_agent:run_agent
+```
+
+The callable receives the same payload as the HTTP adapter:
+
+```json
+{
+  "scenario_id": "goal_hijack.basic_001",
+  "input": {}
+}
+```
+
+The callable may return either a `Trace` or a trace-shaped dictionary.
+
+Python targets are loaded only through the explicit `--python-target` CLI flag. Scenario files should not contain Python import paths.
 
 ### HTTP adapter
 
 The HTTP adapter sends scenario input to a live HTTP target and expects trace-shaped JSON in response.
+
+Example:
+
+```bash
+agent-harness run scenarios/goal_hijack/basic.yaml \
+  --live \
+  --target-url http://127.0.0.1:8000/run
+```
 
 Request body:
 
@@ -382,7 +410,6 @@ The HTTP adapter is the universal integration path. Any language or framework ca
 
 Planned adapter families include:
 
-- Python callable adapter
 - OpenAI Agents SDK adapter
 - LangChain/LangGraph adapter
 - MCP adapter

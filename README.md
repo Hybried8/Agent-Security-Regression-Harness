@@ -42,7 +42,8 @@ The current CLI supports:
 5. Running scenarios against local Python callable targets
 6. Running scenarios against OpenAI Agents SDK targets
 7. Running scenarios against local MCP workflow targets
-8. Emitting machine-readable result JSON
+8. Running scenarios against LangChain/LangGraph invoke targets
+9. Emitting machine-readable result JSON
 
 Currently implemented assertions:
 
@@ -409,6 +410,7 @@ Currently supported:
 - Python callable target execution
 - OpenAI Agents SDK target execution
 - MVP MCP workflow target execution
+- MVP LangChain/LangGraph invoke target execution
 - JSON result output
 - `no_denied_tool_call` assertion
 - `goal_integrity` assertion
@@ -416,7 +418,7 @@ Currently supported:
 Not implemented yet:
 
 - Full MCP host/runtime adapter support
-- LangChain/LangGraph adapters
+- Broad LangChain/LangGraph adapter coverage beyond the synchronous invoke MVP
 - Full assertion library
 - Secret disclosure detection
 - JUnit output

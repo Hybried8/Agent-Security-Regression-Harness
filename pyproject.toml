@@ -38,9 +38,9 @@ dependencies = ["PyYAML>=6.0.0"]
 [project.optional-dependencies]
 dev = ["pytest>=7"]
 openai-agents = ["openai-agents"]
-langchain = []
+langchain = ["langchain", "langgraph"]
 mcp = []
-adapters = ["openai-agents"]
+adapters = ["openai-agents", "langchain", "langgraph"]
 
 [project.urls]
 Homepage = "https://github.com/OWASP/Agent-Security-Regression-Harness"

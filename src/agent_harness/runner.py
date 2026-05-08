@@ -9,6 +9,10 @@ from agent_harness.adapters import (
     run_python_callable_target,
 )
 from agent_harness.assertions import evaluate_assertions
+from agent_harness.langchain_adapter import (
+    load_langchain_target,
+    run_langchain_target,
+)
 from agent_harness.mcp_adapter import run_mcp_target
 from agent_harness.openai_agents_adapter import run_openai_agents_target
 from agent_harness.result import AssertionResult, HarnessResult, aggregate_assertion_results
@@ -121,6 +125,31 @@ def run_scenario_with_mcp_target(
     """Run a scenario against a local MCP-integrated workflow target."""
     target_callable = load_python_callable(mcp_target)
     trace = run_mcp_target(scenario, target_callable)
+    assertion_results = evaluate_assertions(scenario, trace)
+    top_level_result = aggregate_assertion_results(assertion_results)
+
+    return HarnessResult(
+        scenario_id=scenario.id,
+        mode="live",
+        result=top_level_result,
+        assertions=assertion_results,
+        trace=trace,
+    )
+
+
+def run_scenario_with_langchain_target(
+    scenario: Scenario,
+    langchain_target: str,
+    *,
+    goal_event_id: str | None = None,
+) -> HarnessResult:
+    """Run a scenario against a LangChain/LangGraph target."""
+    target = load_langchain_target(langchain_target)
+    trace = run_langchain_target(
+        scenario,
+        target,
+        goal_event_id=goal_event_id,
+    )
     assertion_results = evaluate_assertions(scenario, trace)
     top_level_result = aggregate_assertion_results(assertion_results)
 

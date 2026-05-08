@@ -10,6 +10,7 @@ from agent_harness.adapters import AdapterError
 from agent_harness.runner import (
     dry_run_scenario,
     run_scenario_live,
+    run_scenario_with_langchain_target,
     run_scenario_with_mcp_target,
     run_scenario_with_openai_agent,
     run_scenario_with_python_target,
@@ -99,6 +100,17 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     run_parser.add_argument(
+        "--langchain-target",
+        help=(
+            "Run the scenario against a LangChain/LangGraph target loaded from "
+            "a module:object import path."
+        ),
+    )
+    run_parser.add_argument(
+        "--langchain-goal-event",
+        help="Optional goal event id recorded in the LangChain/LangGraph trace.",
+    )
+    run_parser.add_argument(
         "--openai-agent-max-turns",
         type=int,
         help="Optional max_turns value passed to the OpenAI Agents SDK runner.",
@@ -133,12 +145,14 @@ def main() -> int:
             args.python_target is not None,
             args.openai_agent is not None,
             args.mcp_target is not None,
+            args.langchain_target is not None,
         ]
 
         if sum(bool(mode) for mode in selected_modes) != 1:
             parser.error(
                 "'run' requires exactly one of --dry-run, --trace-file, "
-                "--live, --python-target, --openai-agent, or --mcp-target"
+                "--live, --python-target, --openai-agent, --mcp-target, or "
+                "--langchain-target"
             )
 
         if args.live and not args.target_url:
@@ -149,6 +163,15 @@ def main() -> int:
 
         if args.openai_agent_max_turns is not None and args.openai_agent is None:
             parser.error("--openai-agent-max-turns can only be used with --openai-agent")
+
+        if args.langchain_goal_event is not None and args.langchain_target is None:
+            parser.error("--langchain-goal-event can only be used with --langchain-target")
+
+        if (
+            args.langchain_goal_event is not None
+            and not args.langchain_goal_event.strip()
+        ):
+            parser.error("--langchain-goal-event must be a non-empty string")
 
         if (
             args.openai_agent_max_turns is not None
@@ -195,6 +218,16 @@ def main() -> int:
                 result = run_scenario_with_mcp_target(
                     scenario,
                     args.mcp_target,
+                )
+            except AdapterError as exc:
+                print(f"adapter error: {exc}", file=sys.stderr)
+                return 1
+        elif args.langchain_target:
+            try:
+                result = run_scenario_with_langchain_target(
+                    scenario,
+                    args.langchain_target,
+                    goal_event_id=args.langchain_goal_event,
                 )
             except AdapterError as exc:
                 print(f"adapter error: {exc}", file=sys.stderr)

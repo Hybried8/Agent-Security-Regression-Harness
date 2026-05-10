@@ -125,6 +125,20 @@ def validate_scenario_data(data: Any) -> Scenario:
             )
 
         assertion_type = assertion_type.strip()
+        if assertion_type == "memory_isolation":
+            markers = (
+                data.get("expected", {})
+                .get("memory_isolation", {})
+                .get("forbidden_markers")
+            )
+            if not isinstance(markers, list) or not markers:
+                raise ScenarioValidationError(
+                    "expected.memory_isolation.forbidden_markers must be a non-empty list"
+                )
+            if not all(isinstance(m, str) and m for m in markers):
+                raise ScenarioValidationError(
+                    "all items in expected.memory_isolation.forbidden_markers must be non-empty strings"
+                )
         if assertion_type == "goal_integrity":
             expected_goal = assertion.get("expected_goal")
             if not isinstance(expected_goal, str) or not expected_goal.strip():

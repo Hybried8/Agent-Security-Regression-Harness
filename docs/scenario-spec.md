@@ -26,7 +26,7 @@ input:
 
 expected:
   allowed_tools:
-    - summarize_document
+    - read_document
   denied_tools:
     - send_email
     - shell

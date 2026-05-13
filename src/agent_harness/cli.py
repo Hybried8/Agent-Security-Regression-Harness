@@ -115,6 +115,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         help="Optional max_turns value passed to the OpenAI Agents SDK runner.",
     )
+    run_parser.add_argument(
+        "--target-timeout",
+        type=int,
+        default=30,
+        help="Timeout in seconds for HTTP requests (default: 30)"
+    )
 
     return parser
 
@@ -167,6 +173,13 @@ def main() -> int:
         if args.langchain_goal_event is not None and args.langchain_target is None:
             parser.error("--langchain-goal-event can only be used with --langchain-target")
 
+        #Timer compute
+        if args.target_timeout <= 0:
+            parser.error("--target-timeout must be greater than zero")
+
+        if args.target_timeout != 30 and not args.live:
+            parser.error("--target-timeout can only be used with --live")
+
         if (
             args.langchain_goal_event is not None
             and not args.langchain_goal_event.strip()
@@ -187,10 +200,11 @@ def main() -> int:
 
         if args.dry_run:
             result = dry_run_scenario(scenario)
+
         elif args.live:
             try:
                 assert args.target_url is not None
-                result = run_scenario_live(scenario, args.target_url)
+                result = run_scenario_live(scenario, args.target_url, timeout=args.target_timeout)
             except AdapterError as exc:
                 print(f"adapter error: {exc}", file=sys.stderr)
                 return 1

@@ -10,20 +10,20 @@ Actual runnable files — not just snippets. Every example here is a real file y
 
 | File | What it shows | How to run |
 |------|--------------|------------|
-| `01_hello_scenario.yaml` | A scenario YAML you can validate and run against traces | `agent-harness validate` / `run --trace-file` |
-| `02_trace_pass.json` | Pre-recorded passing trace | used with `--trace-file` |
-| `03_trace_fail.json` | Pre-recorded failing trace | used with `--trace-file` |
-| `04_python_api_demo.py` | Full pipeline via Python API — no CLI, no server | `python .../04_python_api_demo.py` |
-| `05_custom_http_agent.py` | Minimal HTTP agent the harness can talk to | standalone HTTP server |
-| `06_vulnerable_vs_hardened.py` | Side-by-side comparison via Python API | `python .../06_vulnerable_vs_hardened.py` |
-| `07_assertion_authoring.py` | Write + register a custom assertion at runtime | `python .../07_assertion_authoring.py` |
+| `hello_scenario_001.yaml` | A scenario YAML you can validate and run against traces | `agent-harness validate` / `run --trace-file` |
+| `trace_pass_002.json` | Pre-recorded passing trace | used with `--trace-file` |
+| `trace_fail_003.json` | Pre-recorded failing trace | used with `--trace-file` |
+| `python_api_demo_004.py` | Full pipeline via Python API — no CLI, no server | `python .../python_api_demo_004.py` |
+| `custom_http_agent_005.py` | Minimal HTTP agent the harness can talk to | standalone HTTP server |
+| `vulnerable_vs_hardened_006.py` | Side-by-side comparison via Python API | `python .../vulnerable_vs_hardened_006.py` |
+| `assertion_authoring_007.py` | Write + register a custom assertion at runtime | `python .../assertion_authoring_007.py` |
 
 ---
 
 ## Validate the scenario
 
 ```bash
-agent-harness validate docs/cookbook/examples/01_hello_scenario.yaml
+agent-harness validate docs/cookbook/examples/hello_scenario_001.yaml
 ```
 
 Output:
@@ -37,8 +37,8 @@ valid: cookbook.hello_world_001
 ## Run against a passing trace
 
 ```bash
-agent-harness run docs/cookbook/examples/01_hello_scenario.yaml \
-  --trace-file docs/cookbook/examples/02_trace_pass.json
+agent-harness run docs/cookbook/examples/hello_scenario_001.yaml \
+  --trace-file docs/cookbook/examples/trace_pass_002.json
 ```
 
 Output:
@@ -76,8 +76,8 @@ Output:
 ## Run against a failing trace (regression catch)
 
 ```bash
-agent-harness run docs/cookbook/examples/01_hello_scenario.yaml \
-  --trace-file docs/cookbook/examples/03_trace_fail.json
+agent-harness run docs/cookbook/examples/hello_scenario_001.yaml \
+  --trace-file docs/cookbook/examples/trace_fail_003.json
 ```
 
 Output:
@@ -117,7 +117,7 @@ Output:
 ## Python API demo (no CLI, no server)
 
 ```bash
-python docs/cookbook/examples/04_python_api_demo.py
+python docs/cookbook/examples/python_api_demo_004.py
 ```
 
 Output:
@@ -146,12 +146,12 @@ Done. The harness Python API works end-to-end.
 
 Terminal 1:
 ```bash
-python docs/cookbook/examples/05_custom_http_agent.py
+python docs/cookbook/examples/custom_http_agent_005.py
 ```
 
 Terminal 2:
 ```bash
-agent-harness run docs/cookbook/examples/01_hello_scenario.yaml \
+agent-harness run docs/cookbook/examples/hello_scenario_001.yaml \
   --live --target-url http://127.0.0.1:9000/run
 ```
 
@@ -160,7 +160,7 @@ agent-harness run docs/cookbook/examples/01_hello_scenario.yaml \
 ## Vulnerable vs hardened comparison
 
 ```bash
-python docs/cookbook/examples/06_vulnerable_vs_hardened.py
+python docs/cookbook/examples/vulnerable_vs_hardened_006.py
 ```
 
 Output:
@@ -185,7 +185,7 @@ Hardened agent passed!
 ## Custom assertion authoring
 
 ```bash
-python docs/cookbook/examples/07_assertion_authoring.py
+python docs/cookbook/examples/assertion_authoring_007.py
 ```
 
 Output:

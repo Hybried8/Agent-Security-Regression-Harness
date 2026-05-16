@@ -10,14 +10,23 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
 
 
-VERSION = "0.0.1"
 HOST = "127.0.0.1"
 PORT = 9000
 
 
 class DemoAgent(BaseHTTPRequestHandler):
     def do_POST(self):
-        body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))))
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+            if content_length == 0:
+                self.send_response(400)
+                self.end_headers()
+                return
+            body = json.loads(self.rfile.read(content_length))
+        except (json.JSONDecodeError, ValueError):
+            self.send_response(400)
+            self.end_headers()
+            return
         msg = body.get("input", {}).get("user_message", "")
         trace = json.dumps(
             {

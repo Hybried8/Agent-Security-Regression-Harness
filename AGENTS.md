@@ -72,6 +72,6 @@ python -m pytest tests/test_assertions.py  # single file
 - `from __future__ import annotations` in every file
 - Type hints on everything (stdlib types preferred)
 - Dataclasses for models, frozen=True when immutable
-- `AgentHarnessError` subclasses for domain errors
+- Use the existing domain-specific exceptions for errors (e.g., `ScenarioValidationError`, `TraceValidationError`, and `AdapterError`) rather than introducing undocumented base types
 - No external CLI dependencies (argparse only)
 - Obvious names, minimal comments, no dead code

@@ -4,9 +4,6 @@ This script registers a new `no_external_recipient` assertion at runtime
 and evaluates it against traces. It does not modify any source files.
 """
 
-import json
-from typing import Any
-
 from agent_harness.scenario import Scenario, validate_scenario_data
 from agent_harness.trace import Trace
 from agent_harness.assertions import evaluate_assertions

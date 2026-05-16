@@ -710,7 +710,11 @@ agent-harness run scenario.yaml --python-target my_package:sync_agent
 
 ### Async callables
 
-The harness will automatically detect and `await` async functions.
+The harness automatically detects and runs awaitable results from agent callables.
+If the callable returns a coroutine or other awaitable, the harness will `await` it.
+This works for both `async def` functions and regular `def` functions that return an awaitable.
+
+The implementation safely handles event loops, so it's safe to call from both synchronous code and from within an already-running `asyncio` event loop.
 
 ```python
 # my_package/my_agent.py

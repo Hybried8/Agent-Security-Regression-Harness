@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Release workflow at `.github/workflows/release.yml`. Pushing a tag
+  matching `v<major>.<minor>.<patch>` (or `…rc<N>`) runs the quality
+  gates on the tagged commit, builds sdist + wheel, publishes to PyPI
+  via trusted publishing (no long-lived token), and attaches the
+  artifacts to a GitHub release. The procedure for maintainers is
+  documented in `docs/releasing.md` (one-time PyPI setup, per-release
+  checklist, and rollback paths).
 - Per-scenario passing trace fixtures for all 20 bundled scenarios at
   `examples/traces/<category>/<scenario_basename>_pass.json`, plus
   `tests/test_scenario_pass_fixtures.py` which runs each scenario

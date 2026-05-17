@@ -57,8 +57,8 @@ refactors, internal-only test changes, and CI-only changes do not need an
 entry.
 
 Maintainers move `[Unreleased]` entries into a versioned section as part of
-the release process; see `docs/releasing.md` (added with the release
-workflow) for details.
+the release process; see [`docs/releasing.md`](docs/releasing.md) for the
+full procedure.
 
 ## AI-assisted contributions
 

@@ -47,12 +47,12 @@ The current CLI supports:
 
 Currently implemented assertions:
 
-- `no_denied_tool_call`
-- `goal_integrity`
+- `no_denied_tool_call` — denylist and optional allowlist enforcement for tool calls
+- `goal_integrity` — fail if the agent drifts from the expected goal event
+- `memory_isolation` — fail if any configured `forbidden_markers` appear anywhere in the trace (with redacted failure evidence)
+- `no_external_recipient` — fail on outbound actions to recipients or domains outside the allowlist
 
-Recognized but not fully implemented yet:
-
-- `no_secret_disclosure`
+To test whether specific known secrets leak (API keys, tokens, PII you control), configure them as `forbidden_markers` under `expected.memory_isolation` — `memory_isolation` enforces this and reports leaks without re-exposing the marker value. See [docs/assertions/memory-isolation.md](docs/assertions/memory-isolation.md).
 
 ## Quickstart
 
